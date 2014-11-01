@@ -12,6 +12,19 @@ def update_dict(username, dictionary):
     else:
         dictionary[username] += 1
 
+def get_all_redditors_from_a_sub(praw_handle, sub, num_comments):
+    """Return a list of users who sumbitted the last num_comments comments to sub"""
+    # if num_comments == None, get as many comments as possible
+    all_redditors = [] 
+    # Get hot submissions for subreddit
+    sub = praw_handle.get_subreddit(sub)
+    comments = sub.get_comments(limit=num_comments)
+    for comment in comments:
+        author = str(comment.author)
+        if author not in all_redditors:
+            all_redditors.append(author)
+    return all_redditors
+
 def main():
     if len(sys.argv) < 2:
         sys.stderr.write("usage: users_by_comments_by_subreddit.py <subreddit> [number of submissions ('0' for no limit)]\n")
@@ -29,18 +42,14 @@ def main():
                   "https://github.com/brianreallymany/reddit_sna")
     r = praw.Reddit(user_agent=user_agent)
 
-    all_redditors = {} # maps username to number of comments
-    # Get hot submissions for subreddit
-    sub = r.get_subreddit(subreddit)
-    comments = sub.get_comments(limit=None)
-    count = 0
-    for comment in comments:
-        count += 1
-        update_dict(str(comment.author), all_redditors)
+    all_redditors = get_all_redditors_from_a_sub(r, subreddit, NUMBER_OF_RESULTS)
 
-    pprint(all_redditors)
-    print("count is " + str(count))
+    for redditor in all_redditors:
+        print(redditor)
 
+
+############################################################################
 
 if __name__ == '__main__':
     main()
+
