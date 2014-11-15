@@ -1,0 +1,112 @@
+gifs shittytumblrgifs
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in gifs: 850
+users in shittytumblrgifs: 661
+users in common: 2
+O_r is 0.0030257186081694403
+*************************
+theredpill feminism
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in theredpill: 445
+users in feminism: 354
+users in common: 0
+O_r is 0.0
+*************************
+atheism christianity
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in atheism: 473
+users in christianity: 357
+users in common: 4
+O_r is 0.011204481792717087
+*************************
+dogs cats
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in dogs: 373
+users in cats: 584
+users in common: 6
+O_r is 0.0160857908847185
+*************************
+music hiphop
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in music: 630
+users in hiphop: 545
+users in common: 1
+O_r is 0.001834862385321101
+*************************
+gaming truegaming
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in gaming: 722
+users in truegaming: 510
+users in common: 3
+O_r is 0.0058823529411764705
+*************************
+gaming girlgamers
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in gaming: 720
+users in girlgamers: 381
+users in common: 2
+O_r is 0.005249343832020997
+*************************
+books philosophy
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in books: 676
+users in philosophy: 509
+users in common: 2
+O_r is 0.003929273084479371
+*************************
+askreddit todayilearned
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in askreddit: 668
+users in todayilearned: 745
+users in common: 8
+O_r is 0.011976047904191617
+*************************
+pics funny
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in pics: 715
+users in funny: 786
+users in common: 34
+O_r is 0.04755244755244755
+*************************
+gifs funny
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in gifs: 844
+users in funny: 780
+users in common: 13
+O_r is 0.016666666666666666
+*************************
+gifs pics
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in gifs: 844
+users in pics: 716
+users in common: 15
+O_r is 0.02094972067039106
+*************************
+pics videos
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in pics: 708
+users in videos: 841
+users in common: 22
+O_r is 0.031073446327683617
+*************************
+science technology
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in science: 486
+users in technology: 648
+users in common: 8
+O_r is 0.01646090534979424
+*************************
+theredpill twoxchromosomes
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in theredpill: 448
+users in twoxchromosomes: 519
+users in common: 5
+O_r is 0.011160714285714286
+*************************
+askmen askwomen
+Version 2.1.18 of praw is outdated. Version 2.1.19 was released 5 days ago.
+users in askmen: 446
+users in askwomen: 471
+users in common: 27
+O_r is 0.06053811659192825
+*************************
