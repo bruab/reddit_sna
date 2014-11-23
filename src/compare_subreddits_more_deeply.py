@@ -10,8 +10,9 @@ def get_all_redditors_from_a_sub(praw_handle, sub, num_comments=None):
     all_redditors = [] 
     # Get hot submissions for subreddit
     sub = praw_handle.get_subreddit(sub)
-    # TODO DEBUG SETTING!
-    num_comments = 5
+
+    # DEBUG SETTING!
+    num_comments = 50
 
     comments = sub.get_comments(limit=num_comments)
     for comment in comments:
@@ -44,31 +45,37 @@ def main():
     print("users in common: " + str(len(common_users)))
     print("O_r is " + str(O_r))
 
-    print("checking comments for each user now")
+    sys.stderr.write("checking comments for each user now\n\n")
     for user in group1:
-        print("checking comments for user " + str(user))
-        user_comments = user.get_comments(limit=5)
+        num_user_comments = None
+        # DEBUG
+        num_user_comments = 50
+        sys.stderr.write("checking comments for user " + str(user) + "\n")
+        user_comments = user.get_comments(limit=num_user_comments)
         for comment in user_comments:
-            print("currently inspecting this comment: " + str(comment) + " ...from " + str(comment.subreddit))
+            sys.stderr.write("\tcurrently inspecting this comment: " + str(comment) + " ...from " + str(comment.subreddit) + "\n")
             # check who replied to it
-            print("found " + str(len(comment.replies)) + " replies...")
+            sys.stderr.write("\tfound " + str(len(comment.replies)) + " replies...\n")
             for reply in comment.replies:
-                print("looking at a reply by " + str(reply.author))
+                sys.stderr.write("\t\tlooking at a reply by " + str(reply.author) + "\n")
                 if reply.author in group2:
-                    print("found one!")
-                    print(str(reply.author) + "replied to " + str(user) +
-                            "in this comment: " + str(reply))
+                    sys.stderr.write("found one!\n")
+                    print(str(reply.author) + ", a user in " + str(group1) +
+                            ", replied to " + str(user) + ", a user in " + str(group2) +
+                            "in this comment: " + str(reply) + " ... in this subreddit: " +
+                            str(reply.subreddit))
             # check parent comments
             current_comment = comment
             while not current_comment.is_root:
-                print("this comment has a parent; fetching it now.")
+                sys.stderr.write("\tthis comment has a parent; fetching it now.\n")
                 current_comment = r.get_info(thing_id=current_comment.parent_id)
-                print("parent comment author is " + str(current_comment.author))
+                sys.stderr.write("\tparent comment author is " + str(current_comment.author) + "\n")
                 if current_comment.author in group2:
-                    print("found one!")
-                    print(str(comment.author) + " replied to " + 
-                            str(current_comment.author) + "in this comment: " +
-                            str(current_comment))
+                    sys.stderr.write("found one!\n")
+                    print(str(reply.author) + ", a user in " + str(group1) +
+                            ", replied to " + str(user) + ", a user in " + str(group2) +
+                            "in this comment: " + str(reply) + " ... in this subreddit: " +
+                            str(reply.subreddit))
 
     # for each user, find users responded to and users who responded
     # TODO how to store that info? each user can have 2 dicts -- "users_replied_to" and "users_who_replied"
