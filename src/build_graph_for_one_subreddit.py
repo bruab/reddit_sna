@@ -8,6 +8,46 @@ import networkx as nx
 DEBUG = True
 VERBOSE = True
 
+def print_graph_summary(graph):
+    for node in graph.nodes():
+        print("node " + node + " has " + str(len(graph.neighbors(node))) + " neighbors")
+        print("they are:")
+        for neighbor in graph.neighbors(node):
+            print(neighbor + "\t" + graph.node[neighbor]['seen'])
+
+def get_top_N_from_month(subreddit, N, r):
+    return r.get_subreddit(subreddit).get_top_from_month(limit=N)
+
+def update_graph_with_comment(graph, submission, comment, already_added, r):
+    if  isinstance(comment, praw.objects.MoreComments):
+        return graph
+    if comment.author == None:
+        return graph
+
+    this_author = comment.author.name
+
+    # create a node for this_author if necessary
+    if this_author not in graph.nodes():
+        graph.add_node(this_author, seen=submission.permalink)
+        if VERBOSE:
+            print("added new author: " + this_author + " (seen: " + graph.node[this_author]['seen'])
+    else:
+        if VERBOSE:
+            print("author already in the graph: " + this_author + " (seen: " + graph.node[this_author]['seen'])
+            print("and submission.permalink is " + submission.permalink)
+        already_seen = graph.node[this_author]['seen']
+        if submission.permalink not in already_seen:
+            seen_list = already_seen.split(',')
+            seen_list.append(submission.permalink)
+            seen_list = sorted(seen_list)
+            graph.node[this_author]['seen'] = ','.join(seen_list)
+        seen_string = submission.permalink
+    # connect this node to all others in the graph from this submission
+    for author in already_added:
+        graph.add_edge(author, this_author) 
+
+    already_added.append(this_author)
+
 def update_graph_with_submission(graph, submission, r):
     if VERBOSE:
         print("Working on this submission: " + submission.permalink)
@@ -35,34 +75,7 @@ def update_graph_with_submission(graph, submission, r):
     
     already_added = [submission.author.name]
     for comment in flat_comments:
-        if  isinstance(comment, praw.objects.MoreComments):
-            continue
-        if comment.author == None:
-            continue
-
-        this_author = comment.author.name
-
-        # create a node for this_author if necessary
-        if this_author not in graph.nodes():
-            graph.add_node(this_author, seen=submission.permalink)
-            if VERBOSE:
-                print("added new author: " + this_author + " (seen: " + graph.node[this_author]['seen'])
-        else:
-            if VERBOSE:
-                print("author already in the graph: " + this_author + " (seen: " + graph.node[this_author]['seen'])
-                print("and submission.permalink is " + submission.permalink)
-            already_seen = graph.node[this_author]['seen']
-            if submission.permalink not in already_seen:
-                seen_list = already_seen.split(',')
-                seen_list.append(submission.permalink)
-                seen_list = sorted(seen_list)
-                graph.node[this_author]['seen'] = ','.join(seen_list)
-            seen_string = submission.permalink
-        # connect this node to all others in the graph from this submission
-        for author in already_added:
-            graph.add_edge(author, this_author) 
-
-        already_added.append(this_author)
+        update_graph_with_comment(graph, submission, comment, already_added, r)
     return graph
 
 def update_graph_with_top_N_submissions_from_month(graph, N, sub, r):
@@ -77,7 +90,7 @@ def update_graph_with_top_N_submissions_from_month(graph, N, sub, r):
     Returns:
         the updated Graph object
     """
-    top_submissions = r.get_subreddit(sub).get_top_from_month(limit=N)
+    top_submissions = get_top_N_from_month(sub, N, r)
 
     if VERBOSE:
         print("Got " + str(N) + " submission(s) from " + sub)
@@ -107,17 +120,13 @@ def main():
 
     # Summarize graph
     if VERBOSE:
-        for node in graph.nodes():
-            print("node " + node + " has " + str(len(graph.neighbors(node))) + " neighbors")
-            print("they are:")
-            for neighbor in graph.neighbors(node):
-                print(neighbor + "\t" + graph.node[neighbor]['seen'])
+        print_graph_summary(graph)
+        print("writing gexf...")
+
+    nx.write_gexf(graph, 'foo.gexf')
 
     if VERBOSE:
-        print("writing gexf?")
-    nx.write_gexf(graph, 'foo.gexf')
-    if VERBOSE:
-        print("wrote gexf?")
+        print("wrote gexf...")
 
 ############################################################################
 
