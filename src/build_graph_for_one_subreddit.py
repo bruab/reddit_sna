@@ -6,7 +6,7 @@ import collections
 import networkx as nx
 
 DEBUG = True
-VERBOSE = False
+VERBOSE = True
 
 def update_graph_with_submission(graph, submission, r):
     if VERBOSE:
