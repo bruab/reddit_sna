@@ -5,26 +5,14 @@ import praw
 import collections
 import networkx as nx
 
-def main():
-    if len(sys.argv) != 2:
-        sys.stderr.write("usage: build_graph_for_one_subreddit.py <subreddit>\n")
-        sys.exit()
+DEBUG = True
 
-    sub= sys.argv[1]
-
-    user_agent = ("reddit_sna scraper v0.1 by /u/sna_bot "
-                  "https://github.com/brianreallymany/reddit_sna")
-    r = praw.Reddit(user_agent=user_agent)
-
-    graph = nx.Graph()
-
-    # get N top submissions from chosen subreddit
-    N = 2 # TODO command line arg
+def update_graph_with_top_N_submissions_from_month(graph, N, sub, r):
     top_submissions = r.get_subreddit(sub).get_top_from_month(limit=N)
 
     print("Got " + str(N) + " submission(s) from " + sub)
     
-    # loop through submi ssions, adding each submitter and each commenter to the graph
+    # loop through submissions, adding each submitter and each commenter to the graph
     for submission in top_submissions:
         print("Working on this submission: " + submission.permalink)
         print("  author is " + str(submission.author))
@@ -36,8 +24,10 @@ def main():
         #print("Now it has " + str(len(submission.comments)) + " comments")
 
         flat_comments = praw.helpers.flatten_tree(submission.comments)
-        # DEBUG!
-        flat_comments = flat_comments[:40]
+
+        if DEBUG:
+            flat_comments = flat_comments[:40]
+
         print("It has " + str(len(flat_comments)) + " comments")
 
         if submission.author == None:
@@ -45,7 +35,7 @@ def main():
 
         graph.add_node(submission.author.name, seen=submission.permalink) 
         # TODO think long and hard about what to store
-
+        
         already_added = [submission.author.name]
         for comment in flat_comments:
             if  isinstance(comment, praw.objects.MoreComments):
@@ -74,6 +64,26 @@ def main():
                 graph.add_edge(author, this_author) 
 
             already_added.append(this_author)
+    return graph
+
+def main():
+    if len(sys.argv) != 2:
+        sys.stderr.write("usage: build_graph_for_one_subreddit.py <subreddit>\n")
+        sys.exit()
+
+    sub= sys.argv[1]
+
+    user_agent = ("reddit_sna scraper v0.1 by /u/sna_bot "
+                  "https://github.com/brianreallymany/reddit_sna")
+    r = praw.Reddit(user_agent=user_agent)
+
+    graph = nx.Graph()
+
+    # get N top submissions from chosen subreddit
+    N = 2 # TODO command line arg
+
+    graph = update_graph_with_top_N_submissions_from_month(graph, N, sub, r)
+
 
 
 
