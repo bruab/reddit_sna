@@ -5,8 +5,21 @@ import praw
 import collections
 import networkx as nx
 
-DEBUG = True
-VERBOSE = True
+def parse_command_line_args():
+    debug, verbose = False, False
+    if len(sys.argv) < 2:
+        sys.stderr.write("usage: build_graph_for_one_subreddit.py <subreddit> [-d] -[v]\n")
+        sys.stderr.write("(enter -d for debug mode, -v for verbose mode\n)")
+        sys.exit()
+
+    sub= sys.argv[1]
+    if "-d" in sys.argv:
+        debug = True
+    if "-v" in sys.argv:
+        verbose = True
+
+    return sub, debug, verbose
+
 
 def print_graph_summary(graph):
     for node in graph.nodes():
@@ -18,7 +31,7 @@ def print_graph_summary(graph):
 def get_top_N_from_month(subreddit, N, r):
     return r.get_subreddit(subreddit).get_top_from_month(limit=N)
 
-def update_graph_with_comment(graph, submission, comment, already_added, r):
+def update_graph_with_comment(graph, submission, comment, already_added, r, DEBUG, VERBOSE):
     if  isinstance(comment, praw.objects.MoreComments):
         return graph
     if comment.author == None:
@@ -75,10 +88,10 @@ def update_graph_with_submission(graph, submission, r, DEBUG=False, VERBOSE=Fals
     
     already_added = [submission.author.name]
     for comment in flat_comments:
-        update_graph_with_comment(graph, submission, comment, already_added, r)
+        update_graph_with_comment(graph, submission, comment, already_added, r, DEBUG, VERBOSE)
     return graph
 
-def update_graph_with_top_N_submissions_from_month(graph, N, sub, r):
+def update_graph_with_top_N_submissions_from_month(graph, N, sub, r, DEBUG, VERBOSE):
     """Gets top N submissions from given subreddit, updates graph by 'seen in'
 
     Arguments:
@@ -101,11 +114,7 @@ def update_graph_with_top_N_submissions_from_month(graph, N, sub, r):
     return graph
 
 def main():
-    if len(sys.argv) != 2:
-        sys.stderr.write("usage: build_graph_for_one_subreddit.py <subreddit>\n")
-        sys.exit()
-
-    sub= sys.argv[1]
+    sub, DEBUG, VERBOSE = parse_command_line_args()
 
     user_agent = ("reddit_sna scraper v0.1 by /u/sna_bot "
                   "https://github.com/brianreallymany/reddit_sna")
@@ -116,7 +125,7 @@ def main():
     # get N top submissions from chosen subreddit
     N = 2 # TODO command line arg
 
-    graph = update_graph_with_top_N_submissions_from_month(graph, N, sub, r)
+    graph = update_graph_with_top_N_submissions_from_month(graph, N, sub, r, DEBUG, VERBOSE)
 
     # Summarize graph
     if VERBOSE:
