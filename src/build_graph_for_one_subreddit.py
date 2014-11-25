@@ -48,7 +48,7 @@ def update_graph_with_comment(graph, submission, comment, already_added, r):
 
     already_added.append(this_author)
 
-def update_graph_with_submission(graph, submission, r):
+def update_graph_with_submission(graph, submission, r, DEBUG=False, VERBOSE=False):
     if VERBOSE:
         print("Working on this submission: " + submission.permalink)
         print("  author is " + str(submission.author))
@@ -97,7 +97,7 @@ def update_graph_with_top_N_submissions_from_month(graph, N, sub, r):
     
     # loop through submissions, adding each submitter and each commenter to the graph
     for submission in top_submissions:
-        graph = update_graph_with_submission(graph, submission, r)
+        graph = update_graph_with_submission(graph, submission, r, DEBUG, VERBOSE)
     return graph
 
 def main():
