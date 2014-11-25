@@ -31,7 +31,7 @@ def print_graph_summary(graph):
 def get_top_N_from_month(subreddit, N, r):
     return r.get_subreddit(subreddit).get_top_from_month(limit=N)
 
-def update_graph_with_comment(graph, submission, comment, already_added, r, DEBUG, VERBOSE):
+def update_graph_with_comment(graph, submission, comment, already_added, r, DEBUG=False, VERBOSE=False):
     if  isinstance(comment, praw.objects.MoreComments):
         return graph
     if comment.author == None:
@@ -91,7 +91,7 @@ def update_graph_with_submission(graph, submission, r, DEBUG=False, VERBOSE=Fals
         update_graph_with_comment(graph, submission, comment, already_added, r, DEBUG, VERBOSE)
     return graph
 
-def update_graph_with_top_N_submissions_from_month(graph, N, sub, r, DEBUG, VERBOSE):
+def update_graph_with_top_N_submissions_from_month(graph, N, sub, r, DEBUG=False, VERBOSE=False):
     """Gets top N submissions from given subreddit, updates graph by 'seen in'
 
     Arguments:
