@@ -1,0 +1,15 @@
+# TODO testing premise:
+
+consider r/100pushups and r/MakeupAddiction. if 'get_submissions' for each returns the following links:
+http://www.reddit.com/r/100pushups/comments/1v1wvy/i_just_finished_the_initial_test_and_am_ready_to/
+http://www.reddit.com/r/MakeupAddiction/comments/1jwg3o/159_including_shipping_for_12_assorted_eye_liners/
+
+we'll add the users u/I_love_pugs_dammit and u/ohsookie
+
+if 'get submissions for users' returns (at least) this link:
+
+http://www.reddit.com/r/pugs/comments/zjna4/after_years_of_lurking_i_created_an_account/
+
+we have an edge between the two. (the submission is created y I_love_pugs_dammit and commented on
+by ohsookie, also I_love_pugs_dammit replies to ohsookie.)
+
