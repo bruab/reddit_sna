@@ -32,6 +32,7 @@ def print_graph_summary(graph):
         print("they are:")
         for neighbor in graph.neighbors(node):
             print("\t" + neighbor + "\t" + graph.node[neighbor]['user_of'])
+        # TODO figure out how to print stuff about out_group_submissions
 
 def get_top_N_from_month(subreddit, N, r, DEBUG=False, VERBOSE=False):
     if DEBUG:
@@ -183,7 +184,7 @@ def update_graph_with_user_comments(graph, username, r, DEBUG=False, VERBOSE=Fal
     """Fetches user submissions and comments and adds edges to graph.
     * No new nodes are created.
     * Edges between users are created/modified when they appear in the same submission.
-    * If user is a "user_of" the a submission's subreddit, the submission 
+    * If user is a "user_of" a submission's subreddit, the submission 
       is not considered.
     * The submission's permalink is added to the "out_group_submissions" property
       of the edge.
@@ -202,7 +203,7 @@ def update_graph_with_user_comments(graph, username, r, DEBUG=False, VERBOSE=Fal
     all_submissions = []
     # Fetch user submissions and add to list
     if VERBOSE:
-        print("Fetching " + str(fetch_limit) + " submissions and " +
+        print("\nFetching " + str(fetch_limit) + " submissions and " +
                 str(fetch_limit) + " comments' submissions for user " +
                 username)
     subs = user.get_submitted(limit=fetch_limit) # a generator
@@ -233,6 +234,21 @@ def update_graph_with_user_comments(graph, username, r, DEBUG=False, VERBOSE=Fal
     #   with an "out_group_submissions" tag. Edges are added between
     #   users regardless of which subreddit they are each a "user_of".
     # TODO
+    for submission in all_submissions:
+        if VERBOSE:
+            print("Looking at submission " + submission.permalink)
+        for comment in submission.comments:
+            if comment.author == None:
+                continue
+            comment_author = comment.author.name
+            if VERBOSE:
+                print("\t\tFound a comment by " + comment_author)
+            if comment_author in graph.nodes() and comment_author != username:
+                if VERBOSE:
+                    print("\n\n\nOMG OMG user " + comment_author +
+                            " is totally already in the graph!!!\n\n\n")
+                # add edge is all
+                graph.add_edge(username, comment_author, out_group_submissions=submission.permalink) 
 
     return graph
 
