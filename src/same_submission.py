@@ -32,7 +32,12 @@ def print_graph_summary(graph):
         print("they are:")
         for neighbor in graph.neighbors(node):
             print("\t" + neighbor + "\t" + graph.node[neighbor]['user_of'])
-        # TODO figure out how to print stuff about out_group_submissions
+    for node, neighbors in graph.adjacency_iter():
+        for neighbor, eattr in neighbors.items():
+            if 'out_group_submissions' in eattr:
+                print("Found an out_group_submission link between users " +
+                        node + " and " + neighbor + ".")
+                print("The link is from: " + graph[node][neighbor]['out_group_submissions'])
 
 def get_top_N_from_month(subreddit, N, r, DEBUG=False, VERBOSE=False):
     if DEBUG:
@@ -180,7 +185,7 @@ def update_graph_with_subreddit_of_interest(graph, N, sub, r, DEBUG=False, VERBO
         graph = update_graph_with_in_group_submission(graph, submission, r, DEBUG, VERBOSE)
     return graph
 
-def update_graph_with_user_comments(graph, username, r, DEBUG=False, VERBOSE=False):
+def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, VERBOSE=False):
     """Fetches user submissions and comments and adds edges to graph.
     * No new nodes are created.
     * Edges between users are created/modified when they appear in the same submission.
@@ -193,6 +198,8 @@ def update_graph_with_user_comments(graph, username, r, DEBUG=False, VERBOSE=Fal
         graph: a NetworkX Graph object
         username: a string representing a praw.Redditor.name
         r: a praw.Reddit object
+        in_groups: a tuple containing the names of the two 'reference'
+                   subreddits for this experiment
 
     Returns:
         the updated Graph object
@@ -212,6 +219,7 @@ def update_graph_with_user_comments(graph, username, r, DEBUG=False, VERBOSE=Fal
     # Fetch user comments
     comms = user.get_comments(limit=fetch_limit) # a generator
     for comm in comms:
+        # Discard if it's from an 'in_group' subreddit
         subreddit = comm.subreddit.display_name
         if subreddit in graph.node[username]['user_of']:
             if VERBOSE:
@@ -225,10 +233,19 @@ def update_graph_with_user_comments(graph, username, r, DEBUG=False, VERBOSE=Fal
             if comment_submission not in all_submissions:
                 all_submissions.append(comment_submission)
 
+    # Filter submissions, discarding those from 'in_group' subreddits;
+    #   at this point we're only interested in chance meetings
+    all_submissions = [s for s in all_submissions if s.subreddit.display_name not in in_groups]
+
     if VERBOSE:
         print("After filtering in_group submissions and duplicates, " +
                 "found " + str(len(all_submissions)) +
                 " submissions for user " + username)
+
+    if DEBUG:
+        if username == "I_love_pugs_dammit":
+            print("Adding out group link submission for debugging...")
+            all_submissions.append(r.get_submission("http://www.reddit.com/r/pugs/comments/zjna4/after_years_of_lurking_i_created_an_account/"))
 
     # For each submission, update graph by creating/modifying edges
     #   with an "out_group_submissions" tag. Edges are added between
@@ -245,9 +262,7 @@ def update_graph_with_user_comments(graph, username, r, DEBUG=False, VERBOSE=Fal
                 print("\t\tFound a comment by " + comment_author)
             if comment_author in graph.nodes() and comment_author != username:
                 if VERBOSE:
-                    print("\n\n\nOMG OMG user " + comment_author +
-                            " is totally already in the graph!!!\n\n\n")
-                # add edge is all
+                    print("\t\t\tComment author is already in the graph, but this is an out_group submission! Jackpot!")
                 graph.add_edge(username, comment_author, out_group_submissions=submission.permalink) 
 
     return graph
@@ -283,7 +298,7 @@ def main():
     #   submission, add an edge with "out_group_submissions"
     #   and the submission permalink.
     for user in graph.nodes():
-        update_graph_with_user_comments(graph, user, r, DEBUG, VERBOSE)
+        update_graph_with_user_comments(graph, user, r, (sub1, sub2), DEBUG, VERBOSE)
 
 
     # Summarize graph
