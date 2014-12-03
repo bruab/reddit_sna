@@ -255,6 +255,8 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
         if VERBOSE:
             print("Looking at submission " + submission.permalink)
         for comment in submission.comments:
+            if  isinstance(comment, praw.objects.MoreComments):
+                continue
             if comment.author == None:
                 continue
             comment_author = comment.author.name
