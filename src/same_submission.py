@@ -223,7 +223,14 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
                 str(fetch_limit) + " comments' submissions for user " +
                 username)
     subs = user.get_submitted(limit=fetch_limit) # a generator
-    [all_submissions.append(sub) for sub in subs] # has_fetched = True
+    try:
+        [all_submissions.append(sub) for sub in subs] # has_fetched = True
+    except Exception as e:
+        sys.stderr.write("Exception when fetching submissions for redditor " +
+                         username + ". Skipping ...\n")
+        sys.stderr.write(str(e) + "\n")
+        time.sleep(120)
+        return graph
 
     # Fetch user comments
     comms = user.get_comments(limit=fetch_limit) # a generator
