@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import time
 import praw
 import collections
 import networkx as nx
@@ -84,13 +85,13 @@ def update_graph_with_comment(graph, submission, comment, already_added, r, DEBU
     # create a node for this_author if necessary
     if this_author in graph.nodes():
         if VERBOSE:
-            print("author already in the graph: " + this_author +
+            print("\t\t\tauthor already in the graph: " + this_author +
                     " (user_of: " + graph.node[this_author]['user_of'] + ")")
     else:
         graph.add_node(this_author, 
                        user_of=submission.subreddit.display_name)
         if VERBOSE:
-            print("added new author: " + this_author + " (user_of: " +
+            print("\t\t\tadded new author: " + this_author + " (user_of: " +
                     graph.node[this_author]['user_of'] + ")")
 
 
@@ -131,8 +132,8 @@ def update_graph_with_in_group_submission(graph, submission, r, DEBUG=False, VER
         return graph
 
     if VERBOSE:
-        print("Working on this submission: " + submission.permalink)
-        print("  author is " + str(submission.author))
+        print("\tWorking on this submission: " + submission.permalink)
+        print("\t\tauthor is " + str(submission.author))
 
     if not DEBUG:
         pass # TODO
@@ -148,7 +149,7 @@ def update_graph_with_in_group_submission(graph, submission, r, DEBUG=False, VER
     if DEBUG: # fewer comments, faster runtime, smaller graph
         flat_comments = flat_comments[:40]
     if VERBOSE:
-        print("It has " + str(len(flat_comments)) + " comments")
+        print("\t\tIt has " + str(len(flat_comments)) + " comments")
 
     # Add node for Submission author (if necessary)
     if submission.author not in graph.nodes():
@@ -178,7 +179,7 @@ def update_graph_with_subreddit_of_interest(graph, N, sub, r, DEBUG=False, VERBO
     top_submissions = get_top_N_from_month(sub, N, r, DEBUG, VERBOSE)
 
     if VERBOSE:
-        print("Got " + str(N) + " submission(s) from " + sub)
+        print("\tGot " + str(N) + " submission(s) from " + sub)
     
     # loop through submissions, adding each submitter and each commenter to the graph
     for submission in top_submissions:
@@ -206,11 +207,19 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
     """
     fetch_limit = 1 # None for 'as many as possible'
 
-    user = r.get_redditor(username) # has_fetched = True
+    try:
+        user = r.get_redditor(username) # has_fetched = True
+    except Exception as e: 
+        sys.stderr.write("Exception when fetching redditor " +
+                         username + ". Skipping ...\n")
+        sys.stderr.write(str(e) + "\n")
+        time.sleep(120)
+        return graph
+
     all_submissions = []
     # Fetch user submissions and add to list
     if VERBOSE:
-        print("\nFetching " + str(fetch_limit) + " submissions and " +
+        print("\tFetching " + str(fetch_limit) + " submissions and " +
                 str(fetch_limit) + " comments' submissions for user " +
                 username)
     subs = user.get_submitted(limit=fetch_limit) # a generator
@@ -223,12 +232,13 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
         subreddit = comm.subreddit.display_name
         if subreddit in graph.node[username]['user_of']:
             if VERBOSE:
-                print("Disregarding comment and its containing submission; user "
+                print("\t\tDisregarding comment and its containing submission; user "
                         + username + " is a 'user_of' " + subreddit)
             continue
         else:
             # Add the comment's containing submission to all_submissions
             #   if it's not already in there
+            # TODO can we possibly save some API calls here?
             comment_submission = comm.submission
             if comment_submission not in all_submissions:
                 all_submissions.append(comment_submission)
@@ -238,34 +248,38 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
     all_submissions = [s for s in all_submissions if s.subreddit.display_name not in in_groups]
 
     if VERBOSE:
-        print("After filtering in_group submissions and duplicates, " +
+        print("\t\tAfter filtering in_group submissions and duplicates, " +
                 "found " + str(len(all_submissions)) +
                 " submissions for user " + username)
 
     if DEBUG:
         if username == "I_love_pugs_dammit":
-            print("Adding out group link submission for debugging...")
+            print("\t\tAdding out group link submission for debugging...")
             all_submissions.append(r.get_submission("http://www.reddit.com/r/pugs/comments/zjna4/after_years_of_lurking_i_created_an_account/"))
 
     # For each submission, update graph by creating/modifying edges
     #   with an "out_group_submissions" tag. Edges are added between
     #   users regardless of which subreddit they are each a "user_of".
-    # TODO
     for submission in all_submissions:
         if VERBOSE:
-            print("Looking at submission " + submission.permalink)
-        for comment in submission.comments:
-            if  isinstance(comment, praw.objects.MoreComments):
-                continue
-            if comment.author == None:
-                continue
-            comment_author = comment.author.name
-            if VERBOSE:
-                print("\t\tFound a comment by " + comment_author)
-            if comment_author in graph.nodes() and comment_author != username:
+            print("\t\t\tLooking at submission " + submission.permalink)
+        try:
+            for comment in submission.comments:
+                if  isinstance(comment, praw.objects.MoreComments):
+                    continue
+                if comment.author == None:
+                    continue
+                comment_author = comment.author.name
                 if VERBOSE:
-                    print("\t\t\tComment author is already in the graph, but this is an out_group submission! Jackpot!")
-                graph.add_edge(username, comment_author, out_group_submissions=submission.permalink) 
+                    print("\t\t\t\tFound a comment by " + comment_author)
+                if comment_author in graph.nodes() and comment_author != username:
+                    if VERBOSE:
+                        print("\n\t\t\t\t\tComment author is already in the graph, but this is an out_group submission! Jackpot!\n")
+                    graph.add_edge(username, comment_author, out_group_submissions=submission.permalink) 
+        except Exception as e:
+            sys.stderr.write("\nException occurred in update_graph_with_user_comments(): ")
+            sys.stderr.write(str(e) + "\n")
+            sys.stderr.write("Not all comments parsed from submission " + submission.permalink + "\n")
 
     return graph
 
@@ -284,6 +298,9 @@ def main():
     submissions_per_subreddit = 1 # TODO command line arg
 
     # Add nodes and edges for users of first subreddit
+    if VERBOSE:
+        print("\nAdding nodes and in_group_submissions edges for first subreddit, " + 
+                sub1)
     graph = update_graph_with_subreddit_of_interest(graph, 
             submissions_per_subreddit, sub1, r, DEBUG, VERBOSE)
 
@@ -291,6 +308,9 @@ def main():
     #   If the two subreddits have any  users in common,
     #   edges between them will be annotated with the 
     #   "in_group_submissions" field and the name of the submission
+    if VERBOSE:
+        print("Adding nodes and in_group_submissions edges for second subreddit, " + 
+                sub2)
     graph = update_graph_with_subreddit_of_interest(graph,
             submissions_per_subreddit, sub2, r, DEBUG, VERBOSE)
 
@@ -299,6 +319,8 @@ def main():
     #   If other users from the graph are present in the same
     #   submission, add an edge with "out_group_submissions"
     #   and the submission permalink.
+    if VERBOSE:
+        print("\nNow updating graph with submissions and comments from all users.\n")
     for user in graph.nodes():
         update_graph_with_user_comments(graph, user, r, (sub1, sub2), DEBUG, VERBOSE)
 
