@@ -176,15 +176,20 @@ def update_graph_with_subreddit_of_interest(graph, N, sub, r, DEBUG=False, VERBO
     Returns:
         the updated Graph object
     """
-    top_submissions = get_top_N_from_month(sub, N, r, DEBUG, VERBOSE)
+    top_submissions = get_top_N_from_month(sub, N, r, DEBUG, VERBOSE) # has_fetched = False
 
     if VERBOSE:
         print("\tGot " + str(N) + " submission(s) from " + sub)
     
     # loop through submissions, adding each submitter and each commenter to the graph
-    for submission in top_submissions:
-        graph = update_graph_with_in_group_submission(graph, submission, r, DEBUG, VERBOSE)
-    return graph
+    try:
+        for submission in top_submissions:
+            graph = update_graph_with_in_group_submission(graph, submission, r, DEBUG, VERBOSE)
+        return graph
+    except Exception as e: 
+        sys.stderr.write("Error fetching top submissions for subreddit " + sub.display_name + ". Exiting. Sorry.\n")
+        sys.exit()
+    
 
 def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, VERBOSE=False):
     """Fetches user submissions and comments and adds edges to graph.
