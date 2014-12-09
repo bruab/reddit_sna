@@ -9,18 +9,28 @@ import networkx as nx
 def parse_command_line_args():
     debug, verbose = False, False
     if len(sys.argv) < 3:
-        sys.stderr.write("usage: same_sumission.py <subreddit1> <subreddit2> [-d] -[v]\n")
-        sys.stderr.write("(enter -d for debug mode, -v for verbose mode\n)")
+        sys.stderr.write("usage: same_sumission.py <subreddit1> <subreddit2> [-d] -[v] [-l limit]\n")
+        sys.stderr.write("(enter -d for debug mode, -v for verbose mode)\n")
+        sys.stderr.write("(enter -l 10 for a submission fetch limit of 10)\n")
+        sys.stderr.write("(enter -l None for as many as possible)\n")
         sys.exit()
 
     sub1 = sys.argv[1]
     sub2 = sys.argv[2]
-    if "-d" in sys.argv:
-        debug = True
-    if "-v" in sys.argv:
-        verbose = True
+    if len(sys.argv) > 3:
+        for i, arg in enumerate(sys.argv[3:]):
+            if "-d" in arg:
+                debug = True
+            elif "-v" in arg:
+                verbose = True
+            elif "l" in arg:
+                limit_string = sys.argv[i+4] # b/c we're starting at the 4th
+                if limit_string == "None":
+                    limit = None
+                else:
+                    limit = int(limit_string)
 
-    return sub1, sub2, debug, verbose
+    return sub1, sub2, debug, verbose, limit
 
 
 def print_graph_summary(graph):
@@ -191,7 +201,7 @@ def update_graph_with_subreddit_of_interest(graph, N, sub, r, DEBUG=False, VERBO
         sys.exit()
     
 
-def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, VERBOSE=False):
+def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, VERBOSE=False, LIMIT=1):
     """Fetches user submissions and comments and adds edges to graph.
     * No new nodes are created.
     * Edges between users are created/modified when they appear in the same submission.
@@ -210,7 +220,7 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
     Returns:
         the updated Graph object
     """
-    fetch_limit = 10 # None for 'as many as possible'
+    fetch_limit = LIMIT
 
     try:
         user = r.get_redditor(username) # has_fetched = True
@@ -301,7 +311,7 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
     return graph
 
 def main():
-    sub1, sub2, DEBUG, VERBOSE = parse_command_line_args()
+    sub1, sub2, DEBUG, VERBOSE, LIMIT = parse_command_line_args()
 
     if DEBUG:
         sub1, sub2 = '100pushups', 'MakeupAddiction'
@@ -312,7 +322,7 @@ def main():
 
     graph = nx.Graph()
 
-    submissions_per_subreddit = 10 # TODO command line arg
+    submissions_per_subreddit = LIMIT
 
     # Add nodes and edges for users of first subreddit
     if VERBOSE:
@@ -339,7 +349,7 @@ def main():
     if VERBOSE:
         print("\nNow updating graph with submissions and comments from all users.\n")
     for user in graph.nodes():
-        update_graph_with_user_comments(graph, user, r, (sub1, sub2), DEBUG, VERBOSE)
+        update_graph_with_user_comments(graph, user, r, (sub1, sub2), DEBUG, VERBOSE, LIMIT)
 
 
     # Summarize graph
