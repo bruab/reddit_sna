@@ -251,9 +251,14 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
             # Add the comment's containing submission to all_submissions
             #   if it's not already in there
             # TODO can we possibly save some API calls here?
-            comment_submission = comm.submission
-            if comment_submission not in all_submissions:
-                all_submissions.append(comment_submission)
+            try:
+                comment_submission = comm.submission
+                if comment_submission not in all_submissions:
+                    all_submissions.append(comment_submission)
+            except Exception as e:
+                sys.stderr.write("Error fetching submission for " + str(comm))
+                sys.stderr.write("Skipping ...")
+                continue
 
     # Filter submissions, discarding those from 'in_group' subreddits;
     #   at this point we're only interested in chance meetings
