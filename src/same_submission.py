@@ -210,7 +210,7 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
     Returns:
         the updated Graph object
     """
-    fetch_limit = 1 # None for 'as many as possible'
+    fetch_limit = 10 # None for 'as many as possible'
 
     try:
         user = r.get_redditor(username) # has_fetched = True
@@ -307,7 +307,7 @@ def main():
 
     graph = nx.Graph()
 
-    submissions_per_subreddit = 1 # TODO command line arg
+    submissions_per_subreddit = 10 # TODO command line arg
 
     # Add nodes and edges for users of first subreddit
     if VERBOSE:
