@@ -199,7 +199,7 @@ def update_graph_with_subreddit_of_interest(graph, N, sub, r, DEBUG=False, VERBO
             graph = update_graph_with_in_group_submission(graph, submission, r, DEBUG, VERBOSE)
         return graph
     except Exception as e: 
-        sys.stderr.write("Error fetching top submissions for subreddit " + sub.display_name + ". Exiting. Sorry.\n")
+        sys.stderr.write("Error fetching top submissions for subreddit " + str(sub) + ". Exiting. Sorry.\n")
         sys.exit()
     
 
