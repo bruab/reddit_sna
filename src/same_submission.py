@@ -2,6 +2,7 @@
 
 import sys
 import time
+import datetime
 import praw
 import collections
 import networkx as nx
@@ -17,6 +18,7 @@ def parse_command_line_args():
 
     sub1 = sys.argv[1]
     sub2 = sys.argv[2]
+    limit = 1 # default
     if len(sys.argv) > 3:
         for i, arg in enumerate(sys.argv[3:]):
             if "-d" in arg:
@@ -24,7 +26,7 @@ def parse_command_line_args():
             elif "-v" in arg:
                 verbose = True
             elif "l" in arg:
-                limit_string = sys.argv[i+4] # b/c we're starting at the 4th
+                limit_string = sys.argv[i+4] # b/c for loop starts at the 4th
                 if limit_string == "None":
                     limit = None
                 else:
@@ -357,7 +359,12 @@ def main():
         print_graph_summary(graph)
         print("writing gexf...")
 
-    nx.write_gexf(graph, 'foo.gexf')
+    # Write .gexf file
+    timestamp = datetime.datetime.now().isoformat()
+    filename = sub1 + "." + sub2 + "."
+    filename += "limit_" + str(LIMIT) + "."
+    filename += timestamp + ".gexf"
+    nx.write_gexf(graph, filename)
 
     if VERBOSE:
         print("wrote gexf...")
