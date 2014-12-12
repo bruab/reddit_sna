@@ -224,6 +224,10 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
     """
     fetch_limit = LIMIT
 
+    # make in group subreddit names lowercase for easier string comparison
+    # (in case the display_name is MakeupAddiction but command line arg was 'makeupaddiction'
+    in_groups = ( in_groups[0].lower(), in_groups[1].lower() )
+
     try:
         user = r.get_redditor(username) # has_fetched = True
     except Exception as e: 
@@ -274,7 +278,8 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
 
     # Filter submissions, discarding those from 'in_group' subreddits;
     #   at this point we're only interested in chance meetings
-    all_submissions = [s for s in all_submissions if s.subreddit.display_name not in in_groups]
+    #   Note that we're comparing the lower() versions of the subreddit names
+    all_submissions = [s for s in all_submissions if s.subreddit.display_name.lower() not in in_groups]
 
     if VERBOSE:
         print("\t\tAfter filtering in_group submissions and duplicates, " +
