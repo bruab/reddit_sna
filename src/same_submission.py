@@ -59,13 +59,14 @@ def get_top_N_from_month(subreddit, N, r, DEBUG=False, VERBOSE=False):
     if DEBUG:
         if subreddit == '100pushups':
             url = "http://www.reddit.com/r/100pushups/comments/1v1wvy/i_just_finished_the_initial_test_and_am_ready_to/"
-            debug_submission = r.get_submission(url)
+            debug_submission = r.get_submission(url) # has_fetched = True
             return [debug_submission]
         elif subreddit == 'MakeupAddiction':
             url = "http://www.reddit.com/r/MakeupAddiction/comments/1jwg3o/159_including_shipping_for_12_assorted_eye_liners/"
             debug_submission = r.get_submission(url)
             return [debug_submission]
     else:
+        # Return a generator object (has_fetched = False)
         return r.get_subreddit(subreddit).get_top_from_month(limit=N)
 
 def update_graph_with_comment(graph, submission, comment, 
@@ -124,7 +125,8 @@ def update_graph_with_comment(graph, submission, comment,
         graph.add_edge(author, this_author, 
                 in_group_submissions=submission.permalink) 
 
-    already_added.append(this_author)
+    if this_author not in already_added:
+        already_added.append(this_author)
 
 def update_graph_with_in_group_submission(graph, submission, r, 
                                     DEBUG=False, VERBOSE=False):
@@ -154,14 +156,16 @@ def update_graph_with_in_group_submission(graph, submission, r,
         print("\tWorking on this submission: " + submission.permalink)
         print("\t\tauthor is " + str(submission.author))
 
+    # Fetch MoreComments (unless in DEBUG mode)
     if not DEBUG:
-        pass # TODO
-        # Deal with MoreComments 
+        X = 5 # TODO limit=None
+        try:
+            submission.replace_more_comments(limit=X)
+        except Exception as e:
+            sys.stderr.write("replace_more_comments "+\
+                    " caught an Exception: " + str(e) + "\n")
         if VERBOSE:
-            pass
-            #print("Fetching MoreComments")
-        #X = 5 # TODO limit=None
-        #submission.replace_more_comments(limit=X, threshold=0)
+            print("Fetching MoreComments")
 
     flat_comments = praw.helpers.flatten_tree(submission.comments)
 
@@ -200,22 +204,23 @@ def update_graph_with_subreddit_of_interest(graph, N, sub, r,
     """
     top_submissions = get_top_N_from_month(sub, N, r, DEBUG, VERBOSE) 
     # has_fetched = False
+    # unless DEBUG
 
     if VERBOSE:
         print("\tGot " + str(N) + " submission(s) from " + sub)
     
     # loop through submissions, 
     # adding each submitter and each commenter to the graph
-    try:
-        for submission in top_submissions:
+    for submission in top_submissions:
+        try:
             graph = update_graph_with_in_group_submission(graph, submission, 
                                                             r, DEBUG, VERBOSE)
-        return graph
-    except Exception as e: 
-        sys.stderr.write("Error fetching top submissions for subreddit " +\
-                         str(sub) + ". Exiting. Sorry.\n")
-        sys.exit()
+        except Exception as e: 
+            sys.stderr.write("Error fetching top submissions for subreddit " +\
+                             str(sub) + ". Exiting. Sorry.\n")
+            #sys.exit()
     
+    return graph
 
 def update_graph_with_user_comments(graph, username, r, in_groups, 
                             DEBUG=False, VERBOSE=False, LIMIT=1):
