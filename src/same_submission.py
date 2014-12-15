@@ -266,44 +266,45 @@ def update_graph_with_user_comments(graph, username, r, in_groups,
                 username)
     subs = user.get_submitted(limit=fetch_limit) # a generator
     for submission in subs:
+        subreddit = submission.subreddit.display_name.lower()
+        if subreddit == in_groups[0] or subreddit == in_groups[1]:
+            if VERBOSE:
+                print("\tSkipping submission " + submission.permalink +\
+                        " ... it's from an in_group\n")
+            continue
         try:
-            all_submissions.append(sub)
+            all_submissions.append(submission)
         except Exception as e:
-            sys.stderr.write("Exception when fetching a submissions "
+            sys.stderr.write("Exception when fetching a submission "
                     "for redditor " +
                              username + ". Skipping ...\n")
             sys.stderr.write(str(e) + "\n")
-            time.sleep(120)
+            time.sleep(15)
 
     # Fetch user comments
     comms = user.get_comments(limit=fetch_limit) # a generator
     for comm in comms:
         # Discard if it's from an 'in_group' subreddit
-        subreddit = comm.subreddit.display_name
-        if subreddit in graph.node[username]['user_of']:
+        subreddit = comm.subreddit.display_name.lower()
+        if subreddit == in_groups[0] or subreddit == in_groups[1]:
             if VERBOSE:
                 print("\t\tDisregarding comment and its containing "+\
-                        "submission; user " + username + " is a 'user_of' "\
-                        + subreddit)
+                        "submission;  it comes from an in_group\n")
             continue
         else:
             # Add the comment's containing submission to all_submissions
             #   if it's not already in there
-            # TODO can we possibly save some API calls here?
+            # TODO from comment permalink can find submission,
+            # then no need fetch for "in all_submissions" test
+            # save some API calls
             try:
-                comment_submission = comm.submission
+                comment_submission = comm.submission # fetch
                 if comment_submission not in all_submissions:
                     all_submissions.append(comment_submission)
             except Exception as e:
                 sys.stderr.write("Error fetching submission for " + str(comm))
                 sys.stderr.write("Skipping ...")
                 continue
-
-    # Filter submissions, discarding those from 'in_group' subreddits;
-    #   at this point we're only interested in chance meetings
-    #   Note that we're comparing the lower() versions of the subreddit names
-    all_submissions = [s for s in all_submissions 
-            if s.subreddit.display_name.lower() not in in_groups]
 
     if VERBOSE:
         print("\t\tAfter filtering in_group submissions and duplicates, " +
