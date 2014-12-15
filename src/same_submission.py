@@ -296,7 +296,7 @@ def update_graph_with_user_comments(graph, username, r, in_groups,
             #   if it's not already in there
             # TODO from comment permalink can find submission,
             # then no need fetch for "in all_submissions" test
-            # save some API calls
+            # save some API calls maybe?
             try:
                 comment_submission = comm.submission # fetch
                 if comment_submission not in all_submissions:
