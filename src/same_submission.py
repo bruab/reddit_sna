@@ -10,7 +10,8 @@ import networkx as nx
 def parse_command_line_args():
     debug, verbose = False, False
     if len(sys.argv) < 3:
-        sys.stderr.write("usage: same_sumission.py <subreddit1> <subreddit2> [-d] -[v] [-l limit]\n")
+        sys.stderr.write("usage: same_sumission.py <subreddit1> <subreddit2>"+\
+                         "[-d] -[v] [-l limit]\n")
         sys.stderr.write("(enter -d for debug mode, -v for verbose mode)\n")
         sys.stderr.write("(enter -l 10 for a submission fetch limit of 10)\n")
         sys.stderr.write("(enter -l None for as many as possible)\n")
@@ -41,7 +42,8 @@ def print_graph_summary(graph):
             print("\n\n\n**********\n\n\n*********")
             print("user of more than one: " + graph.node[node]['user_of'])
             print("\n\n\n**********\n\n\n*********")
-        print("node " + node + " has " + str(len(graph.neighbors(node))) + " neighbors")
+        print("node " + node + " has " + str(len(graph.neighbors(node)))+\
+              " neighbors")
         print("they are:")
         for neighbor in graph.neighbors(node):
             print("\t" + neighbor + "\t" + graph.node[neighbor]['user_of'])
@@ -50,7 +52,8 @@ def print_graph_summary(graph):
             if 'out_group_submissions' in eattr:
                 print("Found an out_group_submission link between users " +
                         node + " and " + neighbor + ".")
-                print("The link is from: " + graph[node][neighbor]['out_group_submissions'])
+                print("The link is from: " +\
+                      graph[node][neighbor]['out_group_submissions'])
 
 def get_top_N_from_month(subreddit, N, r, DEBUG=False, VERBOSE=False):
     if DEBUG:
@@ -65,7 +68,8 @@ def get_top_N_from_month(subreddit, N, r, DEBUG=False, VERBOSE=False):
     else:
         return r.get_subreddit(subreddit).get_top_from_month(limit=N)
 
-def update_graph_with_comment(graph, submission, comment, already_added, r, DEBUG=False, VERBOSE=False):
+def update_graph_with_comment(graph, submission, comment, 
+           already_added, r, DEBUG=False, VERBOSE=False):
     """Creates/modifies nodes and edges based on an "in_group" comment.
     * Each node is tagged as "user of" subreddit.
     * Edges between comment author and users in 'already_added' are created
@@ -117,14 +121,17 @@ def update_graph_with_comment(graph, submission, comment, already_added, r, DEBU
 
     # connect this node to all others in the graph from this submission
     for author in already_added:
-        graph.add_edge(author, this_author, in_group_submissions=submission.permalink) 
+        graph.add_edge(author, this_author, 
+                in_group_submissions=submission.permalink) 
 
     already_added.append(this_author)
 
-def update_graph_with_in_group_submission(graph, submission, r, DEBUG=False, VERBOSE=False):
+def update_graph_with_in_group_submission(graph, submission, r, 
+                                    DEBUG=False, VERBOSE=False):
     """Creates/modifies nodes and edges based on an "in_group" submission.
     * Each node is tagged as "user of" subreddit.
-    * Edges between users are created/modified when they appear in the same submission.
+    * Edges between users are created/modified when they appear in 
+      the same submission.
     * The submission's permalink is added to the "in_group_submissions" property
       of the edge.
     * Returns graph unmodified if submission.author is Deleted
@@ -165,14 +172,17 @@ def update_graph_with_in_group_submission(graph, submission, r, DEBUG=False, VER
 
     # Add node for Submission author (if necessary)
     if submission.author not in graph.nodes():
-        graph.add_node(submission.author.name, user_of=submission.subreddit.display_name) 
+        graph.add_node(submission.author.name, 
+                user_of=submission.subreddit.display_name) 
     
     already_added = [submission.author.name]
     for comment in flat_comments:
-        update_graph_with_comment(graph, submission, comment, already_added, r, DEBUG, VERBOSE)
+        update_graph_with_comment(graph, submission, comment, 
+                already_added, r, DEBUG, VERBOSE)
     return graph
 
-def update_graph_with_subreddit_of_interest(graph, N, sub, r, DEBUG=False, VERBOSE=False):
+def update_graph_with_subreddit_of_interest(graph, N, sub, r, 
+                                    DEBUG=False, VERBOSE=False):
     """Gets top N submissions from given subreddit, updates graph.
     * Each node is tagged as "user of" subreddit.
     * Edges between users are created/modified when they appear in the same submission.
@@ -188,29 +198,35 @@ def update_graph_with_subreddit_of_interest(graph, N, sub, r, DEBUG=False, VERBO
     Returns:
         the updated Graph object
     """
-    top_submissions = get_top_N_from_month(sub, N, r, DEBUG, VERBOSE) # has_fetched = False
+    top_submissions = get_top_N_from_month(sub, N, r, DEBUG, VERBOSE) 
+    # has_fetched = False
 
     if VERBOSE:
         print("\tGot " + str(N) + " submission(s) from " + sub)
     
-    # loop through submissions, adding each submitter and each commenter to the graph
+    # loop through submissions, 
+    # adding each submitter and each commenter to the graph
     try:
         for submission in top_submissions:
-            graph = update_graph_with_in_group_submission(graph, submission, r, DEBUG, VERBOSE)
+            graph = update_graph_with_in_group_submission(graph, submission, 
+                                                            r, DEBUG, VERBOSE)
         return graph
     except Exception as e: 
-        sys.stderr.write("Error fetching top submissions for subreddit " + str(sub) + ". Exiting. Sorry.\n")
+        sys.stderr.write("Error fetching top submissions for subreddit " +\
+                         str(sub) + ". Exiting. Sorry.\n")
         sys.exit()
     
 
-def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, VERBOSE=False, LIMIT=1):
+def update_graph_with_user_comments(graph, username, r, in_groups, 
+                            DEBUG=False, VERBOSE=False, LIMIT=1):
     """Fetches user submissions and comments and adds edges to graph.
     * No new nodes are created.
-    * Edges between users are created/modified when they appear in the same submission.
+    * Edges between users are created/modified when they appear in 
+      the same submission.
     * If user is a "user_of" a submission's subreddit, the submission 
       is not considered.
-    * The submission's permalink is added to the "out_group_submissions" property
-      of the edge.
+    * The submission's permalink is added to the "out_group_submissions" 
+      property of the edge.
 
     Arguments:
         graph: a NetworkX Graph object
@@ -225,7 +241,8 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
     fetch_limit = LIMIT
 
     # make in group subreddit names lowercase for easier string comparison
-    # (in case the display_name is MakeupAddiction but command line arg was 'makeupaddiction'
+    # (in case the display_name is MakeupAddiction but command line 
+    # arg was 'makeupaddiction')
     in_groups = ( in_groups[0].lower(), in_groups[1].lower() )
 
     try:
@@ -260,8 +277,9 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
         subreddit = comm.subreddit.display_name
         if subreddit in graph.node[username]['user_of']:
             if VERBOSE:
-                print("\t\tDisregarding comment and its containing submission; user "
-                        + username + " is a 'user_of' " + subreddit)
+                print("\t\tDisregarding comment and its containing "+\
+                        "submission; user " + username + " is a 'user_of' "\
+                        + subreddit)
             continue
         else:
             # Add the comment's containing submission to all_submissions
@@ -279,7 +297,8 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
     # Filter submissions, discarding those from 'in_group' subreddits;
     #   at this point we're only interested in chance meetings
     #   Note that we're comparing the lower() versions of the subreddit names
-    all_submissions = [s for s in all_submissions if s.subreddit.display_name.lower() not in in_groups]
+    all_submissions = [s for s in all_submissions 
+            if s.subreddit.display_name.lower() not in in_groups]
 
     if VERBOSE:
         print("\t\tAfter filtering in_group submissions and duplicates, " +
@@ -306,14 +325,20 @@ def update_graph_with_user_comments(graph, username, r, in_groups, DEBUG=False, 
                 comment_author = comment.author.name
                 if VERBOSE:
                     print("\t\t\t\tFound a comment by " + comment_author)
-                if comment_author in graph.nodes() and comment_author != username:
+                if comment_author in graph.nodes() and \
+                        comment_author != username:
                     if VERBOSE:
-                        print("\n\t\t\t\t\tComment author is already in the graph, but this is an out_group submission! Jackpot!\n")
-                    graph.add_edge(username, comment_author, out_group_submissions=submission.permalink) 
+                        print("\n\t\t\t\t\tComment author is already"+\
+                              " in the graph, but this is an out_group"+\
+                              " submission! Jackpot!\n")
+                    graph.add_edge(username, comment_author, 
+                            out_group_submissions=submission.permalink) 
         except Exception as e:
-            sys.stderr.write("\nException occurred in update_graph_with_user_comments(): ")
+            sys.stderr.write("\nException occurred in "+\
+                             " update_graph_with_user_comments(): ")
             sys.stderr.write(str(e) + "\n")
-            sys.stderr.write("Not all comments parsed from submission " + submission.permalink + "\n")
+            sys.stderr.write("Not all comments parsed from submission "+\
+                    submission.permalink + "\n")
 
     return graph
 
@@ -333,8 +358,8 @@ def main():
 
     # Add nodes and edges for users of first subreddit
     if VERBOSE:
-        print("\nAdding nodes and in_group_submissions edges for first subreddit, " + 
-                sub1)
+        print("\nAdding nodes and in_group_submissions edges for first "+\
+                " subreddit, " + sub1)
     graph = update_graph_with_subreddit_of_interest(graph, 
             submissions_per_subreddit, sub1, r, DEBUG, VERBOSE)
 
@@ -343,8 +368,8 @@ def main():
     #   edges between them will be annotated with the 
     #   "in_group_submissions" field and the name of the submission
     if VERBOSE:
-        print("Adding nodes and in_group_submissions edges for second subreddit, " + 
-                sub2)
+        print("Adding nodes and in_group_submissions edges for second "+\
+                "subreddit, " + sub2)
     graph = update_graph_with_subreddit_of_interest(graph,
             submissions_per_subreddit, sub2, r, DEBUG, VERBOSE)
 
@@ -354,9 +379,11 @@ def main():
     #   submission, add an edge with "out_group_submissions"
     #   and the submission permalink.
     if VERBOSE:
-        print("\nNow updating graph with submissions and comments from all users.\n")
+        print("\nNow updating graph with submissions and comments from "+\
+                "all users.\n")
     for user in graph.nodes():
-        update_graph_with_user_comments(graph, user, r, (sub1, sub2), DEBUG, VERBOSE, LIMIT)
+        update_graph_with_user_comments(graph, user, r, (sub1, sub2), 
+                                        DEBUG, VERBOSE, LIMIT)
 
 
     # Summarize graph
