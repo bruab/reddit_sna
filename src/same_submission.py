@@ -125,6 +125,7 @@ def update_graph_with_comment(graph, submission, comment,
         graph.add_edge(author, this_author, 
                 in_group_submissions=submission.permalink) 
 
+    # modifies passed-in list, doesn't return, ick
     if this_author not in already_added:
         already_added.append(this_author)
 
@@ -217,9 +218,7 @@ def update_graph_with_subreddit_of_interest(graph, N, sub, r,
                                                             r, DEBUG, VERBOSE)
         except Exception as e: 
             sys.stderr.write("Error fetching top submissions for subreddit " +\
-                             str(sub) + ". Exiting. Sorry.\n")
-            #sys.exit()
-    
+                             str(sub) + ".\n")
     return graph
 
 def update_graph_with_user_comments(graph, username, r, in_groups, 
