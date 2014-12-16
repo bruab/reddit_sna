@@ -322,6 +322,14 @@ def update_graph_with_user_comments(graph, username, r, in_groups,
     for submission in all_submissions:
         if VERBOSE:
             print("\t\t\tLooking at submission " + submission.permalink)
+            try:
+                X = 5 # TODO limit=None
+                submission.replace_more_comments(limit=X)
+                if VERBOSE:
+                    print("Fetching MoreComments")
+            except Exception as e:
+                sys.stderr.write("replace_more_comments "+\
+                        " caught an Exception: " + str(e) + "\n")
         try:
             for comment in submission.comments:
                 if  isinstance(comment, praw.objects.MoreComments):
