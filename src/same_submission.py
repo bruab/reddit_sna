@@ -394,11 +394,15 @@ def main():
     #   and the submission permalink.
     if VERBOSE:
         print("\nNow updating graph with submissions and comments from "+\
-                "all users.\n")
+                str(len(graph.nodes())) + " users.\n")
+    count = 1
     for user in graph.nodes():
         update_graph_with_user_comments(graph, user, r, (sub1, sub2), 
                                         DEBUG, VERBOSE, LIMIT)
-
+        count += 1
+        if VERBOSE:
+            if count % 100 == 0:
+                print("\n\t\tNow processing user " + str(count) + "\n")
 
     # Summarize graph
     if VERBOSE:
