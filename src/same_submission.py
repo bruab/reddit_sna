@@ -266,14 +266,14 @@ def update_graph_with_user_comments(graph, username, r, in_groups,
                 username)
     subs = user.get_submitted(limit=fetch_limit) # a generator
     for submission in subs:
-        subreddit = submission.subreddit.display_name.lower()
-        if subreddit == in_groups[0] or subreddit == in_groups[1]:
-            if VERBOSE:
-                print("\tSkipping submission " + submission.permalink +\
-                        " ... it's from an in_group\n")
-            continue
         try:
-            all_submissions.append(submission)
+            subreddit = submission.subreddit.display_name.lower()
+            if subreddit == in_groups[0] or subreddit == in_groups[1]:
+                if VERBOSE:
+                    print("\tSkipping submission " + submission.permalink +\
+                            " ... it's from an in_group\n")
+                    continue
+                all_submissions.append(submission)
         except Exception as e:
             sys.stderr.write("Exception when fetching a submission "
                     "for redditor " +
@@ -284,27 +284,27 @@ def update_graph_with_user_comments(graph, username, r, in_groups,
     # Fetch user comments
     comms = user.get_comments(limit=fetch_limit) # a generator
     for comm in comms:
-        # Discard if it's from an 'in_group' subreddit
-        subreddit = comm.subreddit.display_name.lower()
-        if subreddit == in_groups[0] or subreddit == in_groups[1]:
-            if VERBOSE:
-                print("\t\tDisregarding comment and its containing "+\
-                        "submission;  it comes from an in_group\n")
-            continue
-        else:
-            # Add the comment's containing submission to all_submissions
-            #   if it's not already in there
-            # TODO from comment permalink can find submission,
-            # then no need fetch for "in all_submissions" test
-            # save some API calls maybe?
-            try:
-                comment_submission = comm.submission # fetch
+        try:
+            # Discard if it's from an 'in_group' subreddit
+            subreddit = comm.subreddit.display_name.lower()
+            if subreddit == in_groups[0] or subreddit == in_groups[1]:
+                if VERBOSE:
+                    print("\t\tDisregarding comment and its containing "+\
+                            "submission;  it comes from an in_group\n")
+                continue
+            else:
+                # Add the comment's containing submission to all_submissions
+                #   if it's not already in there
+                # TODO from comment permalink can find submission,
+                # then no need fetch for "in all_submissions" test
+                # save some API calls maybe?
+                comment_submission = comm.submission # fetch, i think?
                 if comment_submission not in all_submissions:
                     all_submissions.append(comment_submission)
-            except Exception as e:
-                sys.stderr.write("Error fetching submission for " + str(comm))
-                sys.stderr.write("Skipping ...")
-                continue
+        except Exception as e:
+            sys.stderr.write("Error fetching submission for " + str(comm))
+            sys.stderr.write("Skipping ...")
+            continue
 
     if VERBOSE:
         print("\t\tAfter filtering in_group submissions and duplicates, " +
