@@ -1,0 +1,85 @@
+<gexf version="1.1" xmlns="http://www.gexf.net/1.1draft" xmlns:viz="http://www.gexf.net/1.1draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance">
+  <graph defaultedgetype="undirected" mode="static">
+    <attributes class="edge" mode="static">
+      <attribute id="1" title="in_group_submissions" type="string" />
+      <attribute id="2" title="out_group_submissions" type="string" />
+    </attributes>
+    <attributes class="node" mode="static">
+      <attribute id="0" title="user_of" type="string" />
+    </attributes>
+    <nodes>
+      <node id="TryUsingScience" label="TryUsingScience">
+        <attvalues>
+          <attvalue for="0" value="100pushups" />
+        </attvalues>
+      </node>
+      <node id="KurtRussellsBeard" label="KurtRussellsBeard">
+        <attvalues>
+          <attvalue for="0" value="100pushups" />
+        </attvalues>
+      </node>
+      <node id="flow-er" label="flow-er">
+        <attvalues>
+          <attvalue for="0" value="MakeupAddiction" />
+        </attvalues>
+      </node>
+      <node id="ohsookie" label="ohsookie">
+        <attvalues>
+          <attvalue for="0" value="MakeupAddiction" />
+        </attvalues>
+      </node>
+      <node id="BNSquash" label="BNSquash">
+        <attvalues>
+          <attvalue for="0" value="MakeupAddiction" />
+        </attvalues>
+      </node>
+      <node id="I_love_pugs_dammit" label="I_love_pugs_dammit">
+        <attvalues>
+          <attvalue for="0" value="100pushups" />
+        </attvalues>
+      </node>
+    </nodes>
+    <edges>
+      <edge id="0" source="TryUsingScience" target="I_love_pugs_dammit">
+        <attvalues>
+          <attvalue for="1" value="http://www.reddit.com/r/100pushups/comments/1v1wvy/i_just_finished_the_initial_test_and_am_ready_to/" />
+        </attvalues>
+      </edge>
+      <edge id="1" source="TryUsingScience" target="KurtRussellsBeard">
+        <attvalues>
+          <attvalue for="1" value="http://www.reddit.com/r/100pushups/comments/1v1wvy/i_just_finished_the_initial_test_and_am_ready_to/" />
+        </attvalues>
+      </edge>
+      <edge id="2" source="KurtRussellsBeard" target="I_love_pugs_dammit">
+        <attvalues>
+          <attvalue for="1" value="http://www.reddit.com/r/100pushups/comments/1v1wvy/i_just_finished_the_initial_test_and_am_ready_to/" />
+        </attvalues>
+      </edge>
+      <edge id="3" source="flow-er" target="ohsookie">
+        <attvalues>
+          <attvalue for="1" value="http://www.reddit.com/r/MakeupAddiction/comments/1jwg3o/159_including_shipping_for_12_assorted_eye_liners/" />
+        </attvalues>
+      </edge>
+      <edge id="4" source="flow-er" target="BNSquash">
+        <attvalues>
+          <attvalue for="1" value="http://www.reddit.com/r/MakeupAddiction/comments/1jwg3o/159_including_shipping_for_12_assorted_eye_liners/" />
+        </attvalues>
+      </edge>
+      <edge id="5" source="ohsookie" target="I_love_pugs_dammit">
+        <attvalues>
+          <attvalue for="2" value="http://www.reddit.com/r/pugs/comments/zjna4/after_years_of_lurking_i_created_an_account/" />
+        </attvalues>
+      </edge>
+      <edge id="6" source="ohsookie" target="BNSquash">
+        <attvalues>
+          <attvalue for="1" value="http://www.reddit.com/r/MakeupAddiction/comments/1jwg3o/159_including_shipping_for_12_assorted_eye_liners/" />
+        </attvalues>
+      </edge>
+      <edge id="7" source="I_love_pugs_dammit" target="I_love_pugs_dammit">
+        <attvalues>
+          <attvalue for="1" value="http://www.reddit.com/r/100pushups/comments/1v1wvy/i_just_finished_the_initial_test_and_am_ready_to/" />
+        </attvalues>
+      </edge>
+    </edges>
+  </graph>
+</gexf>

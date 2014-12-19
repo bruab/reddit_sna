@@ -1,0 +1,53 @@
+working on therellikofthenight
+	visited: [u'TheRedPill', u'SquaredCircle']
+working on Antibuddy
+	visited: [u'TheRedPill', u'PublicFreakout']
+working on Hrjdc
+	visited: [u'seduction', u'TheRedPill', u'SocialEngineering', u'DarkTriad', u'realsocialengineering', u'theoryofpropaganda', u'philosophy']
+working on iggybdawg
+	visited: [u'TheRedPill', u'DeadBedrooms', u'MensRights', u'daddit', u'subaru', u'mensrightslinks', u'AskMen']
+working on UniversityofToronto
+	visited: [u'cringe', u'TheRedPill']
+working on baconreader9000
+	visited: [u'videos', u'ECE', u'australia', u'AskReddit', u'GlobalOffensive', u'gaming', u'television', u'TheRedPill', u'nexus4']
+working on Carkudo
+	visited: [u'AskWomen', u'AskMen', u'ShadowBanned', u'personalfinance', u'electronic_cigarette', u'Dreams', u'Health', u'TheRedPill', u'cigars', u'changemyview', u'AskReddit', u'SanctionedSuicide']
+working on AutoModerator
+	visited: [u'wwesupercard', u'GTAA', u'GlobalPowers', u'infiniti', u'longboarding', u'starbound', u'diabetestest', u'testdfsports', u'dfsports', u'randomactsofcsgo', u'TumblrInAction', u'Rateme', u'Documentaries', u'AskReddit', u'Smite', u'ClashOfClansRecruit', u'windowsphone', u'technology', u'GetMotivated']
+working on farkwadian
+	visited: [u'nba', u'videos', u'battlefield3', u'NBA2k', u'totalwar', u'pics', u'TheRedPill', u'short', u'aww', u'gifs', u'LifeProTips', u'funny']
+working on betablueballs
+	visited: [u'TheRedPill']
+working on im-really-not-batman
+	visited: [u'weezer', u'WeAreTheMusicMakers', u'gameofthrones', u'Feminism', u'punchablefaces', u'Catholicism']
+working on ceeho
+	visited: [u'Feminism', u'AskReddit', u'femalefashionadvice', u'insomnia', u'Music', u'Dentistry']
+working on fattict
+	visited: [u'Music', u'punchablefaces', u'ffxiv', u'Feminism', u'pussypassdenied', u'technology', u'im14andthisisdeep', u'AdviceAnimals']
+working on randydog
+	visited: [u'DoesAnybodyElse', u'LSD', u'dogs', u'Showerthoughts', u'Feminism', u'MensRights', u'blunderyears', u'Infographics', u'trashy', u'sex', u'AskWomen']
+working on aMassiveShit
+	visited: [u'ADHD', u'Drugs', u'buildapc', u'LucidDreaming', u'advancedluciddreaming', u'Feminism', u'watchpeopledie', u'todayilearned', u'Physics', u'CrappyDesign', u'FiftyFifty', u'space', u'ambien', u'benzodiazepines']
+working on kuroiniji
+	visited: [u'FeMRADebates', u'MensRights', u'Feminism']
+working on inonesock
+	visited: [u'Feminism', u'woahdude', u'AskReddit']
+working on tweedsweed
+	visited: [u'teenagers', u'TumblrInAction', u'cars', u'AskReddit', u'NoStupidQuestions', u'Feminism', u'casualiama']
+here are the edges with weight > 1:
+(u'MensRights', u'Feminism', 2)
+(u'Music', u'Feminism', 2)
+(u'Feminism', u'Music', 2)
+(u'Feminism', u'AskReddit', 3)
+(u'Feminism', u'MensRights', 2)
+(u'Feminism', u'punchablefaces', 2)
+(u'AskReddit', u'Feminism', 3)
+(u'AskReddit', u'TheRedPill', 2)
+(u'AskReddit', u'TumblrInAction', 2)
+(u'AskMen', u'TheRedPill', 2)
+(u'TheRedPill', u'videos', 2)
+(u'TheRedPill', u'AskMen', 2)
+(u'TheRedPill', u'AskReddit', 2)
+(u'punchablefaces', u'Feminism', 2)
+(u'videos', u'TheRedPill', 2)
+(u'TumblrInAction', u'AskReddit', 2)
